@@ -1,58 +1,18 @@
 # Building
 
-We typically develop against the latest stable version of Xcode.
+No Mac is required: CI (`.github/workflows/ios.yml`) builds an unsigned .ipa on a macOS runner and publishes it as
+an artifact and as a pre-release named `build-<run_number>`. Install it with SideStore (free account).
 
-## 1. Clone
-
-Clone the repo to a working directory:
-
-```
-git clone https://github.com/signalapp/Signal-iOS
-```
-
-We recommend you fork the repo on GitHub, then clone your fork:
+## Locally (macOS)
 
 ```
-git clone https://github.com/<USERNAME>/Signal-iOS.git
+brew install xcodegen
+cd MeshCore && swift test
+cd ../MeshApp && xcodegen generate
+xcodebuild build -project Messagerie.xcodeproj -scheme Messagerie -configuration Release -sdk iphoneos \
+  CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
 ```
 
-You can then add the Signal repo to sync with upstream changes:
+The bundle identifier is `cm.messagerie.app`; SideStore rewrites it when re-signing, and nothing in the code depends on it.
 
-```
-git remote add upstream https://github.com/signalapp/Signal-iOS
-```
-
-## 2. Xcode
-
-Open the `Signal.xcworkspace` in Xcode.
-
-```
-open Signal.xcworkspace
-```
-
-In the TARGETS area of the General tab, change the Team drop down to
-your own. You will need to do that for all the listed targets, for ex.
-Signal, SignalShareExtension, and SignalNSE. You will need an Apple
-Developer account for this.
-
-On the Capabilities tab, turn off Push Notifications, Apple Pay,
-Communication Notifications, and Data Protection, while keeping Background Modes
-on. The App Groups capability will need to remain on in order to access the
-shared data storage. The best way to change the bundle ID for the app groups is
-setting `SIGNAL_BUNDLEID_PREFIX` in the project's settings.
-
-If you wish to test the Documents API, the iCloud capability will need to
-be on with the iCloud Documents option selected.
-
-Build and Run and you are ready to go!
-
-## Known issues
-
-Features related to push notifications are known to be not working for
-third-party contributors since Apple's Push Notification service pushes
-will only work with Open Whisper Systems production code signing
-certificate.
-
-Turn on Push Notifications on the Capabilities tab if you want to register a new Signal account using the application installed via XCode.
-
-If you have any other issues, please ask on the [community forum](https://community.signalusers.org/).
+The upstream Signal targets (`Signal.xcodeproj`) are not built by CI. See docs/REMOVED.md.

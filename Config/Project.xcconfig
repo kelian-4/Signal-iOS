@@ -2,11 +2,11 @@
 // Copyright 2024 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
 //
+// Modified: warnings are no longer treated as errors (see docs/REMOVED.md).
 
-GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES
-GCC_TREAT_WARNINGS_AS_ERRORS = YES
-MTL_TREAT_WARNINGS_AS_ERRORS = YES
-OTHER_SWIFT_FLAGS = $(inherited) -warnings-as-errors
+GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = NO
+GCC_TREAT_WARNINGS_AS_ERRORS = NO
+MTL_TREAT_WARNINGS_AS_ERRORS = NO
 
 // User-specific overrides
 #include? "User.xcconfig"

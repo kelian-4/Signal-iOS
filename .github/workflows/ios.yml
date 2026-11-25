@@ -1,0 +1,51 @@
+name: ios
+on:
+  push:
+    branches: [dev]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package tests (frames, outbox, relay, QR, phrase, backup, service)
+        working-directory: MeshCore
+        run: swift test 2>&1 | tail -n 80; exit ${PIPESTATUS[0]}
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate the Xcode project
+        working-directory: MeshApp
+        run: xcodegen generate
+      - name: Build for device without signing
+        working-directory: MeshApp
+        run: |
+          xcodebuild build -project Messagerie.xcodeproj -scheme Messagerie \
+            -configuration Release -sdk iphoneos -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" 2>&1 | tail -n 60
+          exit ${PIPESTATUS[0]}
+      - name: Package unsigned .ipa
+        working-directory: MeshApp
+        run: |
+          APP=$(find build/Build/Products/Release-iphoneos -maxdepth 1 -name '*.app' | head -1)
+          test -n "$APP"
+          rm -rf Payload Messagerie.ipa
+          mkdir Payload
+          cp -R "$APP" Payload/
+          zip -qr Messagerie.ipa Payload
+          ls -la Messagerie.ipa
+      - uses: actions/upload-artifact@v4
+        with:
+          name: messagerie-unsigned-ipa
+          path: MeshApp/Messagerie.ipa
+      - name: Publish pre-release for SideStore
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "build-${{ github.run_number }}" MeshApp/Messagerie.ipa \
+            --prerelease --target "${{ github.sha }}" \
+            --title "iOS build ${{ github.run_number }}" \
+            --notes "Unsigned .ipa for SideStore (commit ${{ github.sha }})."

@@ -1,0 +1,1064 @@
+{
+ "version": 1,
+ "header_size": 14,
+ "partial_ttl_ms": 300000,
+ "dedup_ttl_ms": 3600000,
+ "frame_encoding": [
+  {
+   "name": "text_single",
+   "type": 1,
+   "msg_id_hex": "0102030405060708",
+   "frag_index": 0,
+   "frag_total": 1,
+   "payload_hex": "68656c6c6f",
+   "frame_hex": "010101020304050607080000000168656c6c6f"
+  },
+  {
+   "name": "text_empty",
+   "type": 1,
+   "msg_id_hex": "0102030405060708",
+   "frag_index": 0,
+   "frag_total": 1,
+   "payload_hex": "",
+   "frame_hex": "0101010203040506070800000001"
+  },
+  {
+   "name": "text_second_of_three",
+   "type": 1,
+   "msg_id_hex": "a1b2c3d4e5f60718",
+   "frag_index": 1,
+   "frag_total": 3,
+   "payload_hex": "77c3b6726c64",
+   "frame_hex": "0101a1b2c3d4e5f607180001000377c3b6726c64"
+  },
+  {
+   "name": "text_big_indices",
+   "type": 1,
+   "msg_id_hex": "ffffffffffffffff",
+   "frag_index": 300,
+   "frag_total": 1000,
+   "payload_hex": "78",
+   "frame_hex": "0101ffffffffffffffff012c03e878"
+  },
+  {
+   "name": "ack",
+   "type": 2,
+   "msg_id_hex": "a1b2c3d4e5f60718",
+   "frag_index": 0,
+   "frag_total": 1,
+   "payload_hex": "",
+   "frame_hex": "0102a1b2c3d4e5f6071800000001"
+  }
+ ],
+ "frame_invalid": [
+  {
+   "name": "empty",
+   "frame_hex": ""
+  },
+  {
+   "name": "too_short",
+   "frame_hex": "01010102030405060708000000"
+  },
+  {
+   "name": "bad_version",
+   "frame_hex": "020101020304050607080000000161"
+  },
+  {
+   "name": "version_zero",
+   "frame_hex": "000101020304050607080000000161"
+  },
+  {
+   "name": "unknown_type",
+   "frame_hex": "010301020304050607080000000161"
+  },
+  {
+   "name": "type_zero",
+   "frame_hex": "010001020304050607080000000161"
+  },
+  {
+   "name": "total_zero",
+   "frame_hex": "010101020304050607080000000061"
+  },
+  {
+   "name": "index_equals_total",
+   "frame_hex": "010101020304050607080002000261"
+  },
+  {
+   "name": "index_above_total",
+   "frame_hex": "010101020304050607080009000261"
+  },
+  {
+   "name": "ack_with_payload",
+   "frame_hex": "010201020304050607080000000161"
+  },
+  {
+   "name": "ack_index_nonzero",
+   "frame_hex": "0102010203040506070800010002"
+  },
+  {
+   "name": "ack_total_two",
+   "frame_hex": "0102010203040506070800000002"
+  }
+ ],
+ "fragmentation": [
+  {
+   "name": "short_fits_one_frame",
+   "text": "hello",
+   "max_frame_size": 244,
+   "msg_id_hex": "0102030405060708",
+   "frames_hex": [
+    "010101020304050607080000000168656c6c6f"
+   ]
+  },
+  {
+   "name": "empty_text",
+   "text": "",
+   "max_frame_size": 244,
+   "msg_id_hex": "0102030405060708",
+   "frames_hex": [
+    "0101010203040506070800000001"
+   ]
+  },
+  {
+   "name": "exact_chunk_is_one_frame",
+   "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "max_frame_size": 244,
+   "msg_id_hex": "a1b2c3d4e5f60718",
+   "frames_hex": [
+    "0101a1b2c3d4e5f60718000000016161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161"
+   ]
+  },
+  {
+   "name": "chunk_plus_one_is_two_frames",
+   "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "max_frame_size": 244,
+   "msg_id_hex": "a1b2c3d4e5f60718",
+   "frames_hex": [
+    "0101a1b2c3d4e5f60718000000026161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161",
+    "0101a1b2c3d4e5f607180001000261"
+   ]
+  },
+  {
+   "name": "default_mtu_20_bytes",
+   "text": "hello world, BLE!",
+   "max_frame_size": 20,
+   "msg_id_hex": "0102030405060708",
+   "frames_hex": [
+    "010101020304050607080000000368656c6c6f20",
+    "0101010203040506070800010003776f726c642c",
+    "010101020304050607080002000320424c4521"
+   ]
+  },
+  {
+   "name": "minimum_frame_15",
+   "text": "abc",
+   "max_frame_size": 15,
+   "msg_id_hex": "ffffffffffffffff",
+   "frames_hex": [
+    "0101ffffffffffffffff0000000361",
+    "0101ffffffffffffffff0001000362",
+    "0101ffffffffffffffff0002000363"
+   ]
+  },
+  {
+   "name": "utf8_multibyte_split",
+   "text": "h\u00e9llo w\u00f6rld \u2713 \ud83d\ude00 Yaound\u00e9",
+   "max_frame_size": 20,
+   "msg_id_hex": "a1b2c3d4e5f60718",
+   "frames_hex": [
+    "0101a1b2c3d4e5f607180000000668c3a96c6c6f",
+    "0101a1b2c3d4e5f60718000100062077c3b6726c",
+    "0101a1b2c3d4e5f60718000200066420e29c9320",
+    "0101a1b2c3d4e5f6071800030006f09f98802059",
+    "0101a1b2c3d4e5f6071800040006616f756e64c3",
+    "0101a1b2c3d4e5f6071800050006a9"
+   ]
+  },
+  {
+   "name": "long_text_mtu_244",
+   "text": "Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE.",
+   "max_frame_size": 244,
+   "msg_id_hex": "ffffffffffffffff",
+   "frames_hex": [
+    "0101ffffffffffffffff00000005426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75",
+    "0101ffffffffffffffff00010005722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f75",
+    "0101ffffffffffffffff000200056e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20",
+    "0101ffffffffffffffff00030005636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065",
+    "0101ffffffffffffffff00040005737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e"
+   ]
+  },
+  {
+   "name": "long_text_mtu_185",
+   "text": "Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE. Bonjour Yaound\u00e9, ceci est un long message de test BLE.",
+   "max_frame_size": 185,
+   "msg_id_hex": "0102030405060708",
+   "frames_hex": [
+    "0101010203040506070800000007426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e",
+    "01010102030405060708000100076a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75",
+    "0101010203040506070800020007722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059",
+    "0101010203040506070800030007616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f75",
+    "01010102030405060708000400076e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3",
+    "0101010203040506070800050007a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20",
+    "0101010203040506070800060007636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e20426f6e6a6f75722059616f756e64c3a92c20636563692065737420756e206c6f6e67206d657373616765206465207465737420424c452e"
+   ]
+  }
+ ],
+ "reassembly": [
+  {
+   "name": "in_order",
+   "steps": [
+    {
+     "t_ms": 0,
+     "frame_hex": "010101020304050607080000000968c3a96c6c6f",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 10,
+     "frame_hex": "01010102030405060708000100092077c3b6726c",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 20,
+     "frame_hex": "01010102030405060708000200096420e29c9320",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 30,
+     "frame_hex": "0101010203040506070800030009f09f98802059",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 40,
+     "frame_hex": "0101010203040506070800040009616f756e64c3",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 50,
+     "frame_hex": "0101010203040506070800050009a92c20746573",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 60,
+     "frame_hex": "0101010203040506070800060009742064652072",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 70,
+     "frame_hex": "0101010203040506070800070009c3a961737365",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 80,
+     "frame_hex": "01010102030405060708000800096d626c616765",
+     "expect": "complete",
+     "msg_id_hex": "0102030405060708",
+     "payload_hex": "68c3a96c6c6f2077c3b6726c6420e29c9320f09f98802059616f756e64c3a92c20746573742064652072c3a9617373656d626c616765"
+    }
+   ]
+  },
+  {
+   "name": "reverse_order",
+   "steps": [
+    {
+     "t_ms": 0,
+     "frame_hex": "01010102030405060708000800096d626c616765",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 10,
+     "frame_hex": "0101010203040506070800070009c3a961737365",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 20,
+     "frame_hex": "0101010203040506070800060009742064652072",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 30,
+     "frame_hex": "0101010203040506070800050009a92c20746573",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 40,
+     "frame_hex": "0101010203040506070800040009616f756e64c3",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 50,
+     "frame_hex": "0101010203040506070800030009f09f98802059",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 60,
+     "frame_hex": "01010102030405060708000200096420e29c9320",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 70,
+     "frame_hex": "01010102030405060708000100092077c3b6726c",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 80,
+     "frame_hex": "010101020304050607080000000968c3a96c6c6f",
+     "expect": "complete",
+     "msg_id_hex": "0102030405060708",
+     "payload_hex": "68c3a96c6c6f2077c3b6726c6420e29c9320f09f98802059616f756e64c3a92c20746573742064652072c3a9617373656d626c616765"
+    }
+   ]
+  },
+  {
+   "name": "shuffled",
+   "steps": [
+    {
+     "t_ms": 0,
+     "frame_hex": "0101010203040506070800030009f09f98802059",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 10,
+     "frame_hex": "010101020304050607080000000968c3a96c6c6f",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 20,
+     "frame_hex": "0101010203040506070800040009616f756e64c3",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 30,
+     "frame_hex": "01010102030405060708000100092077c3b6726c",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 40,
+     "frame_hex": "0101010203040506070800050009a92c20746573",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 50,
+     "frame_hex": "0101010203040506070800060009742064652072",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 60,
+     "frame_hex": "0101010203040506070800070009c3a961737365",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 70,
+     "frame_hex": "01010102030405060708000800096d626c616765",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 80,
+     "frame_hex": "01010102030405060708000200096420e29c9320",
+     "expect": "complete",
+     "msg_id_hex": "0102030405060708",
+     "payload_hex": "68c3a96c6c6f2077c3b6726c6420e29c9320f09f98802059616f756e64c3a92c20746573742064652072c3a9617373656d626c616765"
+    }
+   ]
+  },
+  {
+   "name": "duplicate_fragment_ignored",
+   "steps": [
+    {
+     "t_ms": 0,
+     "frame_hex": "010101020304050607080000000968c3a96c6c6f",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 1,
+     "frame_hex": "010101020304050607080000000968c3a96c6c6f",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 2,
+     "frame_hex": "010101020304050607080000000968c3a96c6c6f",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 10,
+     "frame_hex": "01010102030405060708000100092077c3b6726c",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 11,
+     "frame_hex": "01010102030405060708000200096420e29c9320",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 12,
+     "frame_hex": "0101010203040506070800030009f09f98802059",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 13,
+     "frame_hex": "0101010203040506070800040009616f756e64c3",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 14,
+     "frame_hex": "0101010203040506070800050009a92c20746573",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 15,
+     "frame_hex": "0101010203040506070800060009742064652072",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 16,
+     "frame_hex": "0101010203040506070800070009c3a961737365",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 17,
+     "frame_hex": "01010102030405060708000800096d626c616765",
+     "expect": "complete",
+     "msg_id_hex": "0102030405060708",
+     "payload_hex": "68c3a96c6c6f2077c3b6726c6420e29c9320f09f98802059616f756e64c3a92c20746573742064652072c3a9617373656d626c616765"
+    }
+   ]
+  },
+  {
+   "name": "duplicate_after_complete",
+   "steps": [
+    {
+     "t_ms": 0,
+     "frame_hex": "010101020304050607080000000968c3a96c6c6f",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 1,
+     "frame_hex": "01010102030405060708000100092077c3b6726c",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 2,
+     "frame_hex": "01010102030405060708000200096420e29c9320",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 3,
+     "frame_hex": "0101010203040506070800030009f09f98802059",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 4,
+     "frame_hex": "0101010203040506070800040009616f756e64c3",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 5,
+     "frame_hex": "0101010203040506070800050009a92c20746573",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 6,
+     "frame_hex": "0101010203040506070800060009742064652072",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 7,
+     "frame_hex": "0101010203040506070800070009c3a961737365",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 8,
+     "frame_hex": "01010102030405060708000800096d626c616765",
+     "expect": "complete",
+     "msg_id_hex": "0102030405060708",
+     "payload_hex": "68c3a96c6c6f2077c3b6726c6420e29c9320f09f98802059616f756e64c3a92c20746573742064652072c3a9617373656d626c616765"
+    },
+    {
+     "t_ms": 100,
+     "frame_hex": "010101020304050607080000000968c3a96c6c6f",
+     "expect": "duplicate",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 101,
+     "frame_hex": "01010102030405060708000800096d626c616765",
+     "expect": "duplicate",
+     "msg_id_hex": "0102030405060708"
+    }
+   ]
+  },
+  {
+   "name": "two_messages_interleaved",
+   "steps": [
+    {
+     "t_ms": 0,
+     "frame_hex": "010101020304050607080000000968c3a96c6c6f",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 1,
+     "frame_hex": "0101a1b2c3d4e5f60718000000067365636f6e64",
+     "expect": "partial",
+     "msg_id_hex": "a1b2c3d4e5f60718"
+    },
+    {
+     "t_ms": 2,
+     "frame_hex": "01010102030405060708000100092077c3b6726c",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 3,
+     "frame_hex": "0101a1b2c3d4e5f6071800010006206d65737361",
+     "expect": "partial",
+     "msg_id_hex": "a1b2c3d4e5f60718"
+    },
+    {
+     "t_ms": 4,
+     "frame_hex": "01010102030405060708000200096420e29c9320",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 5,
+     "frame_hex": "0101a1b2c3d4e5f60718000200066765206f7665",
+     "expect": "partial",
+     "msg_id_hex": "a1b2c3d4e5f60718"
+    },
+    {
+     "t_ms": 6,
+     "frame_hex": "0101010203040506070800030009f09f98802059",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 7,
+     "frame_hex": "0101a1b2c3d4e5f6071800030006722073657665",
+     "expect": "partial",
+     "msg_id_hex": "a1b2c3d4e5f60718"
+    },
+    {
+     "t_ms": 8,
+     "frame_hex": "0101010203040506070800040009616f756e64c3",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 9,
+     "frame_hex": "0101a1b2c3d4e5f607180004000672616c206672",
+     "expect": "partial",
+     "msg_id_hex": "a1b2c3d4e5f60718"
+    },
+    {
+     "t_ms": 10,
+     "frame_hex": "0101010203040506070800050009a92c20746573",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 11,
+     "frame_hex": "0101a1b2c3d4e5f6071800050006616d6573",
+     "expect": "complete",
+     "msg_id_hex": "a1b2c3d4e5f60718",
+     "payload_hex": "7365636f6e64206d657373616765206f766572207365766572616c206672616d6573"
+    },
+    {
+     "t_ms": 12,
+     "frame_hex": "0101010203040506070800060009742064652072",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 13,
+     "frame_hex": "0101010203040506070800070009c3a961737365",
+     "expect": "partial",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 14,
+     "frame_hex": "01010102030405060708000800096d626c616765",
+     "expect": "complete",
+     "msg_id_hex": "0102030405060708",
+     "payload_hex": "68c3a96c6c6f2077c3b6726c6420e29c9320f09f98802059616f756e64c3a92c20746573742064652072c3a9617373656d626c616765"
+    }
+   ]
+  },
+  {
+   "name": "single_frame_complete_then_duplicate",
+   "steps": [
+    {
+     "t_ms": 0,
+     "frame_hex": "0101ffffffffffffffff000000016f6e65",
+     "expect": "complete",
+     "msg_id_hex": "ffffffffffffffff",
+     "payload_hex": "6f6e65"
+    },
+    {
+     "t_ms": 5,
+     "frame_hex": "0101ffffffffffffffff000000016f6e65",
+     "expect": "duplicate",
+     "msg_id_hex": "ffffffffffffffff"
+    }
+   ]
+  },
+  {
+   "name": "partial_survives_until_ttl",
+   "steps": [
+    {
+     "t_ms": 0,
+     "frame_hex": "0101a1b2c3d4e5f60718000000027878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878",
+     "expect": "partial",
+     "msg_id_hex": "a1b2c3d4e5f60718"
+    },
+    {
+     "t_ms": 299999,
+     "frame_hex": "0101a1b2c3d4e5f607180001000278787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878",
+     "expect": "complete",
+     "msg_id_hex": "a1b2c3d4e5f60718",
+     "payload_hex": "787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878"
+    }
+   ]
+  },
+  {
+   "name": "partial_expired_then_restart",
+   "steps": [
+    {
+     "t_ms": 0,
+     "frame_hex": "0101a1b2c3d4e5f60718000000027878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878",
+     "expect": "partial",
+     "msg_id_hex": "a1b2c3d4e5f60718"
+    },
+    {
+     "t_ms": 300000,
+     "frame_hex": "0101a1b2c3d4e5f607180001000278787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878",
+     "expect": "partial",
+     "msg_id_hex": "a1b2c3d4e5f60718"
+    },
+    {
+     "t_ms": 300001,
+     "frame_hex": "0101a1b2c3d4e5f60718000000027878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878",
+     "expect": "complete",
+     "msg_id_hex": "a1b2c3d4e5f60718",
+     "payload_hex": "787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878"
+    }
+   ]
+  },
+  {
+   "name": "dedup_memory_expires_after_1h",
+   "steps": [
+    {
+     "t_ms": 0,
+     "frame_hex": "0101ffffffffffffffff000000016f6e65",
+     "expect": "complete",
+     "msg_id_hex": "ffffffffffffffff",
+     "payload_hex": "6f6e65"
+    },
+    {
+     "t_ms": 3599999,
+     "frame_hex": "0101ffffffffffffffff000000016f6e65",
+     "expect": "duplicate",
+     "msg_id_hex": "ffffffffffffffff"
+    },
+    {
+     "t_ms": 3600000,
+     "frame_hex": "0101ffffffffffffffff000000016f6e65",
+     "expect": "complete",
+     "msg_id_hex": "ffffffffffffffff",
+     "payload_hex": "6f6e65"
+    }
+   ]
+  },
+  {
+   "name": "mismatched_total_is_invalid",
+   "steps": [
+    {
+     "t_ms": 0,
+     "frame_hex": "0101a1b2c3d4e5f60718000000027878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878",
+     "expect": "partial",
+     "msg_id_hex": "a1b2c3d4e5f60718"
+    },
+    {
+     "t_ms": 1,
+     "frame_hex": "0101a1b2c3d4e5f60718000100037a7a",
+     "expect": "invalid"
+    },
+    {
+     "t_ms": 2,
+     "frame_hex": "0101a1b2c3d4e5f607180001000278787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878",
+     "expect": "complete",
+     "msg_id_hex": "a1b2c3d4e5f60718",
+     "payload_hex": "787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878"
+    }
+   ]
+  },
+  {
+   "name": "invalid_frames_ignored",
+   "steps": [
+    {
+     "t_ms": 0,
+     "frame_hex": "",
+     "expect": "invalid"
+    },
+    {
+     "t_ms": 1,
+     "frame_hex": "0101",
+     "expect": "invalid"
+    },
+    {
+     "t_ms": 2,
+     "frame_hex": "0101ffffffffffffffff000000016f6e65",
+     "expect": "complete",
+     "msg_id_hex": "ffffffffffffffff",
+     "payload_hex": "6f6e65"
+    }
+   ]
+  },
+  {
+   "name": "ack_passthrough",
+   "steps": [
+    {
+     "t_ms": 0,
+     "frame_hex": "0102010203040506070800000001",
+     "expect": "ack",
+     "msg_id_hex": "0102030405060708"
+    },
+    {
+     "t_ms": 1,
+     "frame_hex": "0102010203040506070800000001",
+     "expect": "ack",
+     "msg_id_hex": "0102030405060708"
+    }
+   ]
+  }
+ ],
+ "stats": [
+  {
+   "name": "odd_count",
+   "latencies_ms": [
+    120,
+    80,
+    300
+   ],
+   "sent": 3,
+   "min": 80,
+   "median": 120,
+   "max": 300,
+   "delivery_ratio": 1.0
+  },
+  {
+   "name": "even_count_floor_median",
+   "latencies_ms": [
+    100,
+    201,
+    50,
+    400
+   ],
+   "sent": 5,
+   "min": 50,
+   "median": 150,
+   "max": 400,
+   "delivery_ratio": 0.8
+  },
+  {
+   "name": "single",
+   "latencies_ms": [
+    42
+   ],
+   "sent": 1,
+   "min": 42,
+   "median": 42,
+   "max": 42,
+   "delivery_ratio": 1.0
+  },
+  {
+   "name": "none_delivered",
+   "latencies_ms": [],
+   "sent": 4,
+   "min": null,
+   "median": null,
+   "max": null,
+   "delivery_ratio": 0.0
+  },
+  {
+   "name": "all_equal",
+   "latencies_ms": [
+    10,
+    10,
+    10,
+    10
+   ],
+   "sent": 4,
+   "min": 10,
+   "median": 10,
+   "max": 10,
+   "delivery_ratio": 1.0
+  }
+ ],
+ "csv": [
+  {
+   "name": "all_acked_sorted_by_time",
+   "rows": [
+    {
+     "msg_id": "0102030405060708",
+     "created_ms": 3000,
+     "state": "acked",
+     "latency_ms": 300
+    },
+    {
+     "msg_id": "a1b2c3d4e5f60718",
+     "created_ms": 1000,
+     "state": "acked",
+     "latency_ms": 80
+    },
+    {
+     "msg_id": "ffffffffffffffff",
+     "created_ms": 2000,
+     "state": "acked",
+     "latency_ms": 120
+    }
+   ],
+   "csv": "msg_id,created_ms,state,latency_ms\na1b2c3d4e5f60718,1000,acked,80\nffffffffffffffff,2000,acked,120\n0102030405060708,3000,acked,300\n# sent=3 acked=3 min_ms=80 median_ms=120 max_ms=300 delivery_pct=100.0\n"
+  },
+  {
+   "name": "mixed_states",
+   "rows": [
+    {
+     "msg_id": "0000000000000001",
+     "created_ms": 10,
+     "state": "acked",
+     "latency_ms": 200
+    },
+    {
+     "msg_id": "0000000000000002",
+     "created_ms": 20,
+     "state": "sent",
+     "latency_ms": null
+    },
+    {
+     "msg_id": "0000000000000003",
+     "created_ms": 30,
+     "state": "pending",
+     "latency_ms": null
+    }
+   ],
+   "csv": "msg_id,created_ms,state,latency_ms\n0000000000000001,10,acked,200\n0000000000000002,20,sent,\n0000000000000003,30,pending,\n# sent=3 acked=1 min_ms=200 median_ms=200 max_ms=200 delivery_pct=33.3\n"
+  },
+  {
+   "name": "none_delivered",
+   "rows": [
+    {
+     "msg_id": "0000000000000004",
+     "created_ms": 5,
+     "state": "pending",
+     "latency_ms": null
+    }
+   ],
+   "csv": "msg_id,created_ms,state,latency_ms\n0000000000000004,5,pending,\n# sent=1 acked=0 min_ms=- median_ms=- max_ms=- delivery_pct=0.0\n"
+  },
+  {
+   "name": "empty",
+   "rows": [],
+   "csv": "msg_id,created_ms,state,latency_ms\n# sent=0 acked=0 min_ms=- median_ms=- max_ms=- delivery_pct=0.0\n"
+  }
+ ],
+ "connection_policy": {
+  "max_client_links": 2,
+  "idle_disconnect_ms": 20000,
+  "should_connect": [
+   {
+    "name": "pending_and_nothing_else",
+    "pending": true,
+    "ready_links": 0,
+    "client_links": 0,
+    "now_ms": 1000,
+    "next_connect_at_ms": 0,
+    "ignore_until_ms": 0,
+    "inbound_from_peer": false,
+    "expect": true
+   },
+   {
+    "name": "nothing_pending_never_connects",
+    "pending": false,
+    "ready_links": 0,
+    "client_links": 0,
+    "now_ms": 1000,
+    "next_connect_at_ms": 0,
+    "ignore_until_ms": 0,
+    "inbound_from_peer": false,
+    "expect": false
+   },
+   {
+    "name": "a_ready_link_already_exists",
+    "pending": true,
+    "ready_links": 1,
+    "client_links": 1,
+    "now_ms": 1000,
+    "next_connect_at_ms": 0,
+    "ignore_until_ms": 0,
+    "inbound_from_peer": false,
+    "expect": false
+   },
+   {
+    "name": "one_client_link_in_progress_still_ok",
+    "pending": true,
+    "ready_links": 0,
+    "client_links": 1,
+    "now_ms": 1000,
+    "next_connect_at_ms": 0,
+    "ignore_until_ms": 0,
+    "inbound_from_peer": false,
+    "expect": true
+   },
+   {
+    "name": "client_cap_reached",
+    "pending": true,
+    "ready_links": 0,
+    "client_links": 2,
+    "now_ms": 1000,
+    "next_connect_at_ms": 0,
+    "ignore_until_ms": 0,
+    "inbound_from_peer": false,
+    "expect": false
+   },
+   {
+    "name": "backoff_not_elapsed",
+    "pending": true,
+    "ready_links": 0,
+    "client_links": 0,
+    "now_ms": 4999,
+    "next_connect_at_ms": 5000,
+    "ignore_until_ms": 0,
+    "inbound_from_peer": false,
+    "expect": false
+   },
+   {
+    "name": "backoff_elapsed_exactly",
+    "pending": true,
+    "ready_links": 0,
+    "client_links": 0,
+    "now_ms": 5000,
+    "next_connect_at_ms": 5000,
+    "ignore_until_ms": 0,
+    "inbound_from_peer": false,
+    "expect": true
+   },
+   {
+    "name": "ignored_peer",
+    "pending": true,
+    "ready_links": 0,
+    "client_links": 0,
+    "now_ms": 8999,
+    "next_connect_at_ms": 0,
+    "ignore_until_ms": 9000,
+    "inbound_from_peer": false,
+    "expect": false
+   },
+   {
+    "name": "inbound_link_from_same_peer_even_if_not_ready",
+    "pending": true,
+    "ready_links": 0,
+    "client_links": 0,
+    "now_ms": 1000,
+    "next_connect_at_ms": 0,
+    "ignore_until_ms": 0,
+    "inbound_from_peer": true,
+    "expect": false
+   },
+   {
+    "name": "ignore_elapsed_exactly",
+    "pending": true,
+    "ready_links": 0,
+    "client_links": 0,
+    "now_ms": 9000,
+    "next_connect_at_ms": 0,
+    "ignore_until_ms": 9000,
+    "inbound_from_peer": false,
+    "expect": true
+   }
+  ],
+  "should_drop_idle": [
+   {
+    "name": "idle_just_below_threshold",
+    "ready": true,
+    "pending": false,
+    "now_ms": 19999,
+    "last_activity_ms": 0,
+    "expect": false
+   },
+   {
+    "name": "idle_at_threshold",
+    "ready": true,
+    "pending": false,
+    "now_ms": 20000,
+    "last_activity_ms": 0,
+    "expect": true
+   },
+   {
+    "name": "idle_but_message_pending",
+    "ready": true,
+    "pending": true,
+    "now_ms": 60000,
+    "last_activity_ms": 0,
+    "expect": false
+   },
+   {
+    "name": "not_ready_link_is_kept",
+    "ready": false,
+    "pending": false,
+    "now_ms": 60000,
+    "last_activity_ms": 0,
+    "expect": false
+   },
+   {
+    "name": "recent_traffic_keeps_link",
+    "ready": true,
+    "pending": false,
+    "now_ms": 70000,
+    "last_activity_ms": 60000,
+    "expect": false
+   }
+  ]
+ }
+}
