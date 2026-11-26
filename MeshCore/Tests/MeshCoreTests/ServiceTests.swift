@@ -75,7 +75,7 @@ final class ServiceTests: XCTestCase {
         let bobId = alice.messenger!.contacts.all().first { $0.displayName == "Bob" }!.id
         _ = try alice.messenger!.sendText(to: bobId, text: "bonjour")
         net.pump()
-        XCTAssertEqual(bobRec.received.map { $0.text }, ["bonjour"])
+        XCTAssertEqual(bobRec.received.map { $0.text }, ["salut", "bonjour"])
         XCTAssertEqual(alice.messenger!.messages.messages(with: bobId).last?.state, .delivered)
 
         let words = alice.recoveryWords()!
