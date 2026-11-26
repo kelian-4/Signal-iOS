@@ -188,6 +188,13 @@ class AppSettingsViewController: OWSTableViewController2 {
         }, actionBlock: { [weak self] in
             self?.didTapDonate()
         }))
+        section1.add(.disclosureItem(
+            icon: .settingsLinkedDevices,
+            withText: "Réseau mesh",
+            actionBlock: { [weak self] in
+                self?.navigationController?.pushViewController(MeshViewController(), animated: true)
+            },
+        ))
         contents.add(section1)
 
         let section2 = OWSTableSection()

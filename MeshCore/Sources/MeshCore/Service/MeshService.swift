@@ -39,6 +39,7 @@ public final class MeshService: MessengerDelegate {
     public let directory: URL
     public weak var delegate: MeshServiceDelegate?
     public var logger: MeshLogger = NullLogger()
+    private let sessionDecorator: ((SessionCrypto) -> SessionCrypto)?
 
     private let vault: SeedVault
     private let nowMs: NowMs
@@ -50,7 +51,9 @@ public final class MeshService: MessengerDelegate {
     private var identity: CryptoKitIdentity?
 
     public init(directory: URL, vault: SeedVault, transport: Transport,
-                config: MeshNode.Config = MeshNode.Config(), now: @escaping NowMs = systemNowMs) {
+                config: MeshNode.Config = MeshNode.Config(), now: @escaping NowMs = systemNowMs,
+                sessionDecorator: ((SessionCrypto) -> SessionCrypto)? = nil) {
+        self.sessionDecorator = sessionDecorator
         self.directory = directory
         self.vault = vault
         self.transport = transport
@@ -65,6 +68,8 @@ public final class MeshService: MessengerDelegate {
     public var displayName: String { return messenger?.displayName ?? "" }
 
     public var publicKey: Data? { return identity?.publicKey }
+
+    public var recoveryEntropy: Data? { return entropy }
 
     public func recoveryWords() -> [String]? {
         guard let e = entropy else { return nil }
@@ -104,7 +109,8 @@ public final class MeshService: MessengerDelegate {
         self.entropy = entropy
         self.identity = id
         let name = Documents.read(Profile.self, from: store, name: "profile")?.displayName ?? "Moi"
-        let sessions = EphemeralSessionCrypto(identity: id, store: store)
+        let base = EphemeralSessionCrypto(identity: id, store: store)
+        let sessions: SessionCrypto = sessionDecorator?(base) ?? base
         let node = MeshNode(transport: transport, outbox: Outbox(store: store), relay: RelayCache(),
                             config: config, now: nowMs)
         node.logger = logger

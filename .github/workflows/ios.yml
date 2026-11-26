@@ -17,22 +17,16 @@ jobs:
         run: |
           set -o pipefail
           swift test 2>&1 | tee "$RUNNER_TEMP/tests.log" | tail -n 80
-      - name: Install XcodeGen
-        run: brew install xcodegen
-      - name: Generate the Xcode project
-        working-directory: MeshApp
-        run: xcodegen generate
-      - name: Build for device without signing
+      - name: Build Signal for device without signing
         id: build
-        working-directory: MeshApp
         run: |
           set -o pipefail
-          xcodebuild build -project Messagerie.xcodeproj -scheme Messagerie \
+          xcodebuild build -workspace Signal.xcworkspace -scheme Signal \
             -configuration Release -sdk iphoneos -derivedDataPath build \
+            -skipMacroValidation -skipPackagePluginValidation \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" 2>&1 | tee "$RUNNER_TEMP/build.log" | tail -n 60
       - name: Package unsigned .ipa
         id: package
-        working-directory: MeshApp
         run: |
           APP=$(find build/Build/Products/Release-iphoneos -maxdepth 1 -name '*.app' | head -1)
           test -n "$APP"
@@ -44,13 +38,13 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: messagerie-unsigned-ipa
-          path: MeshApp/Messagerie.ipa
+          path: Messagerie.ipa
       - name: Publish pre-release for SideStore
         if: github.event_name != 'pull_request'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "build-${{ github.run_number }}" MeshApp/Messagerie.ipa \
+          gh release create "build-${{ github.run_number }}" Messagerie.ipa \
             --prerelease --target "${{ github.sha }}" \
             --title "iOS build ${{ github.run_number }}" \
             --notes "Unsigned .ipa for SideStore (commit ${{ github.sha }})."

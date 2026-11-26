@@ -266,7 +266,7 @@ public class OWSChatConnection {
         private let tokenId: Int
         private weak var chatConnection: OWSChatConnection?
 
-        fileprivate init(tokenId: Int, chatConnection: OWSChatConnection) {
+        init(tokenId: Int, chatConnection: OWSChatConnection?) {
             self.tokenId = tokenId
             self.chatConnection = chatConnection
         }

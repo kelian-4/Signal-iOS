@@ -103,24 +103,7 @@ public class SignalApp {
             owsFailDebug("Missing window.")
             return
         }
-        let logger: PrefixedLogger
-        switch desiredMode {
-        case .registering:
-            logger = PrefixedLogger(prefix: "[Reg]")
-            logger.info("Attempting initial registration on app launch")
-        case .reRegistering:
-            logger = PrefixedLogger(prefix: "[ReReg]")
-            logger.info("Attempting reregistration on app launch")
-        case .changingNumber:
-            logger = PrefixedLogger(prefix: "[ChgNum]")
-            logger.info("Attempting change number registration on app launch")
-        }
-        let coordinator = SSKEnvironment.shared.databaseStorageRef.write { tx in
-            return loader.coordinator(forDesiredMode: desiredMode, transaction: tx, logger: logger)
-        }
-        let navController = RegistrationNavigationController.withCoordinator(coordinator)
-
-        window.rootViewController = navController
+        window.rootViewController = MeshOnboardingViewController()
 
         homeTabBarController = nil
     }

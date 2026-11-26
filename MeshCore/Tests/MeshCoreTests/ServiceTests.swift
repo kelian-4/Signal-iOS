@@ -96,6 +96,26 @@ final class ServiceTests: XCTestCase {
         XCTAssertEqual(bobRec.received.last?.text, "après restauration")
     }
 
+    func testOpaquePayloadDelivery() throws {
+        let clock = TestClock(), net = SimNetwork()
+        let (alice, ta, _) = makeService(clock: clock)
+        let (bob, tb, bobRec) = makeService(clock: clock)
+        _ = try alice.createIdentity(displayName: "Alice")
+        _ = try bob.createIdentity(displayName: "Bob")
+        net.connect(ta, tb)
+        try alice.messenger!.addContact(fromQR: bob.messenger!.myQR(), firstText: "")
+        net.pump()
+        try bob.messenger!.acceptRequest(contactId: bobRec.requests[0].id)
+        net.pump()
+        var received: [Data] = []
+        bob.messenger!.payloadHandler = { data, _ in received.append(data) }
+        let bobId = alice.messenger!.contacts.all().first { $0.displayName == "Bob" }!.id
+        try alice.messenger!.sendPayload(Data([1, 2, 3, 4]), to: bobId)
+        net.pump()
+        XCTAssertEqual(received, [Data([1, 2, 3, 4])])
+        XCTAssertEqual(bobRec.received.count, 0)
+    }
+
     func testWrongBackupKeyRejected() throws {
         let clock = TestClock()
         let (a, _, _) = makeService(clock: clock)

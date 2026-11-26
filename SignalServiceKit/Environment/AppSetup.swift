@@ -561,16 +561,7 @@ extension AppSetup.GlobalsContinuation {
         )
 
         let inactivePrimaryDeviceStore = InactivePrimaryDeviceStore()
-        let chatConnectionManager = ChatConnectionManagerImpl(
-            accountManager: tsAccountManager,
-            appContext: appContext,
-            appExpiry: appExpiry,
-            appReadiness: appReadiness,
-            clockSkewManager: clockSkewManager,
-            db: db,
-            inactivePrimaryDeviceStore: inactivePrimaryDeviceStore,
-            libsignalNet: libsignalNet,
-        )
+        let chatConnectionManager = MeshChatConnectionManager()
 
         let backupRequestManager = BackupRequestManagerImpl(
             backupAuthCredentialManager: BackupAuthCredentialManagerImpl(

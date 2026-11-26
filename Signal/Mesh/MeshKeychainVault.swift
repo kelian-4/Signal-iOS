@@ -1,8 +1,8 @@
 import Foundation
-import Security
 import MeshCore
+import Security
 
-final class KeychainVault: SeedVault {
+final class MeshKeychainVault: SeedVault {
     private let service = "cm.messagerie.identity"
     private let account = "entropy"
 

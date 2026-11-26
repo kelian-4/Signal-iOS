@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A1B2C3D4E5F60718293A4B5F /* MeshCore in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F60718293A4B5D /* MeshCore */; };
+		A1B2C3D4E5F60718293A4B60 /* MeshBLE in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F60718293A4B5E /* MeshBLE */; };
 		07F59254C61C55544866602E /* WebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 6F1A4C201B105514D40AED85 /* WebRTC */; };
 		0D444649A74185022B77D89A /* SignalRingRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 0064D116DC1B78A20DF4FEB3 /* SignalRingRTC */; };
 		13B0034DE05913DB4E5C86E1 /* SignalRingRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 37783C088FC6563374668C3B /* SignalRingRTC */; };
@@ -552,6 +554,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1B2C3D4E5F60718293A4B5F /* MeshCore in Frameworks */,
+				A1B2C3D4E5F60718293A4B60 /* MeshBLE in Frameworks */,
 				D24B5BD5169F568C00681372 /* AudioToolbox.framework in Frameworks */,
 				D221A0E8169DFFC500537ABF /* AVFoundation.framework in Frameworks */,
 				632BFEC630785953005399C0 /* BonMot in Frameworks */,
@@ -890,6 +894,8 @@
 			);
 			name = Signal;
 			packageProductDependencies = (
+				A1B2C3D4E5F60718293A4B5D /* MeshCore */,
+				A1B2C3D4E5F60718293A4B5E /* MeshBLE */,
 				638C27C0308A51C100EE57E0 /* GRDB */,
 				63DAB299308A59AD00764C31 /* SQLCipher */,
 				631759FE30921FC400C98C98 /* LibSignalClient */,
@@ -1134,6 +1140,7 @@
 			);
 			mainGroup = D221A07E169C9E5E00537ABF;
 			packageReferences = (
+				A1B2C3D4E5F60718293A4B5C /* XCLocalSwiftPackageReference "MeshCore" */,
 				632BFEC430785953005399C0 /* XCRemoteSwiftPackageReference "BonMot" */,
 				63DC452E3079AF9100119464 /* XCRemoteSwiftPackageReference "lottie-ios" */,
 				63DC45333079BACE00119464 /* XCRemoteSwiftPackageReference "PureLayout" */,
@@ -3468,6 +3475,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		A1B2C3D4E5F60718293A4B5C /* XCLocalSwiftPackageReference "MeshCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = MeshCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		631759F930921FA700C98C98 /* XCRemoteSwiftPackageReference "libsignal" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -3600,6 +3614,14 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		A1B2C3D4E5F60718293A4B5D /* MeshCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MeshCore;
+		};
+		A1B2C3D4E5F60718293A4B5E /* MeshBLE */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MeshBLE;
+		};
 		0064D116DC1B78A20DF4FEB3 /* SignalRingRTC */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 7B851A5C216FD130C3E4EE2E /* XCRemoteSwiftPackageReference "ringrtc" */;

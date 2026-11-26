@@ -30,6 +30,7 @@ public protocol MessengerDelegate: AnyObject {
 public final class MeshMessenger: MeshNodeDelegate {
     public static let maxTextBytes = 4000
     private static let textKind: UInt8 = 0x01
+    private static let payloadKind: UInt8 = 0x02
 
     private struct HandshakeState: Codable {
         struct Challenge: Codable { var contactId: String; var verifyOnSuccess: Bool; var createdMs: Int64 }
@@ -46,6 +47,7 @@ public final class MeshMessenger: MeshNodeDelegate {
     public let messages: MessageLog
     public var displayName: String
     public weak var delegate: MessengerDelegate?
+    public var payloadHandler: ((Data, Contact) -> Void)?
 
     private let store: DocumentStore
     private let nowMs: NowMs
@@ -270,6 +272,19 @@ public final class MeshMessenger: MeshNodeDelegate {
         return m
     }
 
+    @discardableResult
+    public func sendPayload(_ payload: Data, to contactId: String) throws -> String {
+        guard let c = contacts.contact(id: contactId) else { throw MessengerError.unknownContact }
+        if c.blocked { throw MessengerError.blocked }
+        guard c.status == .accepted else { throw MessengerError.notAccepted }
+        guard sessions.hasSession(contactId: c.id) else { throw MessengerError.cryptoFailure }
+        var plain = Data([MeshMessenger.payloadKind])
+        plain.append(payload)
+        let cipher = try sessions.encrypt(plain, for: c.id)
+        guard let env = directEnvelope(to: c, bodyType: .ciphertext, body: cipher) else { throw MessengerError.cryptoFailure }
+        return node.enqueue(env)
+    }
+
     private func transmit(_ m: inout ChatMessage, to c: Contact) {
         var plain = Data([MeshMessenger.textKind])
         plain.append(Data(m.text.utf8))
@@ -295,7 +310,17 @@ public final class MeshMessenger: MeshNodeDelegate {
     private func handleCiphertext(_ env: Envelope, from c: Contact, msgId: Data) {
         if c.blocked { return }
         guard let plain = try? sessions.decrypt(env.body, from: c.id, remoteIdentity: c.identityKey),
-              plain.count >= 1, plain[plain.startIndex] == MeshMessenger.textKind,
+              plain.count >= 1 else { return }
+        if plain[plain.startIndex] == MeshMessenger.payloadKind {
+            if let secret = routingSecret(for: c) {
+                var body = msgId
+                body.append(RoutingTags.receiptMac(routingSecret: secret, msgId: msgId))
+                if let r = directEnvelope(to: c, bodyType: .receipt, body: body) { node.enqueue(r) }
+            }
+            payloadHandler?(Data(plain.dropFirst()), c)
+            return
+        }
+        guard plain[plain.startIndex] == MeshMessenger.textKind,
               let text = String(data: plain.dropFirst(), encoding: .utf8) else { return }
 
         let m = ChatMessage(id: UUID().uuidString, contactId: c.id, outgoing: false, text: text,

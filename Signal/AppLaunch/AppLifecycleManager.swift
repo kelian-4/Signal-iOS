@@ -187,6 +187,8 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
         debugLogger.enableFileLogging(appContext: mainAppContext, canLaunchInBackground: true)
         DebugLogger.configureSwiftLogging()
 
+        MeshBridge.shared.start()
+
         Logger.warn("Launching…")
         Logger.warn("applicationState: \(mainAppContext.reportedApplicationState.logString)")
         defer { Logger.info("Launched.") }
@@ -857,6 +859,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
 
         // Note that this does much more than set a flag; it will also run all deferred blocks.
         appReadiness.setAppIsReadyUIStillPending()
+        MeshBridge.shared.markAppReady()
 
         Task {
             let backgroundTask = OWSBackgroundTask(label: "AppLaunchesAttemptedCleanup")

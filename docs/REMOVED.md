@@ -11,11 +11,13 @@
 | Project: extension targets, embeds, schemes, alternate icons | removed | Follows the two lines above |
 | Bundle id / name | changed | `cm.messagerie.app`, display name "Messagerie" |
 | Info.plist | rewritten | Bluetooth, camera usage strings; bluetooth-central and bluetooth-peripheral background modes |
-| SMS registration, push, contact discovery, remote storage, websockets, CDN, calls, payments, stories, usernames, badges, donations, crash reporting, log upload | not part of the built app | The shipped app is `MeshApp`, which contains none of these and links no network layer; the upstream sources remain in the tree, unbuilt, under AGPL-3.0 |
+| SMS registration screens | replaced | Onboarding creates an on-device identity (name, 24-word phrase); no phone number, no account |
+| Signal servers: websockets, prekey API, message send/receive | neutralised | `ChatConnectionManager` is replaced by `MeshChatConnectionManager`; sends, prekey fetch/upload and receipts go through a local shim and the BLE mesh. Other network features (CDN, storage service, calls, payments, usernames, donations, push, contact discovery) stay in the tree but have no server and fail offline |
+| Signal UI and message pipeline | kept | Conversations, composer and settings are Signal's own; one added row "Réseau mesh" in Settings |
 
-## Deviation to be aware of
+## Deviations to be aware of
 
-The upstream Signal UI and message pipeline (about 2,350 Swift files tightly coupled to the Signal servers) were not rewired.
-The shipped app is a new SwiftUI app on the `MeshCore` package. Its message encryption is X25519 + ChaCha20-Poly1305 with an
-ephemeral key per message (CryptoKit), not libsignal sessions: no forward secrecy through a ratchet. Replacing
-`EphemeralSessionCrypto` with a libsignal-backed `SessionCrypto` is possible behind the existing protocol.
+- Message encryption is Signal's own libsignal sessions (prekey bundles exchanged over the mesh). The mesh layer wraps each payload with X25519 + ChaCha20-Poly1305.
+- The mesh backup (`.meshbackup`, keyed by the 24 words) covers identity and contacts, not the Signal message database.
+- Attachments, groups, calls, stories and payments are not carried by the mesh and do not work.
+- Nothing here has been run on a device by the author; the first compile is CI.
