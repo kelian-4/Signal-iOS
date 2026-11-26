@@ -13,6 +13,12 @@ public struct BLEPeerInfo: Equatable {
     public let id: String
     public let rssi: Int?
     public let state: String
+
+    public init(id: String, rssi: Int?, state: String) {
+        self.id = id
+        self.rssi = rssi
+        self.state = state
+    }
 }
 
 public struct BLEStatus: Equatable {
@@ -23,6 +29,8 @@ public struct BLEStatus: Equatable {
     public var serverReady = false
     public var readyLinks = 0
     public var peers: [BLEPeerInfo] = []
+
+    public init() {}
 }
 
 private func nowMs() -> Int64 { return Int64(Date().timeIntervalSince1970 * 1000) }

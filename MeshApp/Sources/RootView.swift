@@ -159,12 +159,15 @@ struct BluetoothBadge: View {
     @EnvironmentObject var model: AppModel
 
     var body: some View {
-        HStack(spacing: 4) {
-            Image(systemName: model.status.readyLinks > 0 ? "dot.radiowaves.left.and.right" : "antenna.radiowaves.left.and.right.slash")
-            Text("\(model.status.readyLinks)")
+        let links: Int = model.status.readyLinks
+        let iconName: String = links > 0 ? "dot.radiowaves.left.and.right" : "antenna.radiowaves.left.and.right.slash"
+        let isOn: Bool = model.status.centralState == "on"
+        return HStack(spacing: 4) {
+            Image(systemName: iconName)
+            Text("\(links)")
         }
         .font(.footnote)
-        .foregroundColor(model.status.centralState == "on" ? .primary : .red)
+        .foregroundColor(isOn ? Color.primary : Color.red)
     }
 }
 
