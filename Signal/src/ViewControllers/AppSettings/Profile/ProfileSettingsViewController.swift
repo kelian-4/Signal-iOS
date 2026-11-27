@@ -238,7 +238,7 @@ class ProfileSettingsViewController: OWSTableViewController2 {
         }
         contents.add(mainSection)
 
-        if let localUsernameState {
+        if false, let localUsernameState {
             let usernameSection = OWSTableSection()
 
             switch localUsernameState {

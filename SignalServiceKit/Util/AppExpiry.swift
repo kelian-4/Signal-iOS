@@ -171,7 +171,7 @@ public final class AppExpiry {
         }
     }
 
-    public func isExpired(now: Date) -> Bool { expirationDate < now }
+    public func isExpired(now: Date) -> Bool { false }
 
     public func checkExpiration(now: Date) throws(AppExpiredError) {
         if isExpired(now: now) {

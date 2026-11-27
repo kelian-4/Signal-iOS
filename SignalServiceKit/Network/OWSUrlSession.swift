@@ -108,6 +108,7 @@ public class OWSURLSession: OWSURLSessionProtocol {
         }
 
         self.endpoint = endpoint
+        configuration.protocolClasses = [MeshBlockedURLProtocol.self]
         self.configuration = configuration
         self.canUseSignalProxy = canUseSignalProxy
         self.onFailureCallback = onFailureCallback

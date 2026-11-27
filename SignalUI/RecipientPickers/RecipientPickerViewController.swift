@@ -318,36 +318,29 @@ public class RecipientPickerViewController: OWSViewController, OWSNavigationChil
         }
 
         if allowsAddByAddress, !isSearching {
-            // Find by username
             staticSection.add(OWSTableItem.disclosureItem(
                 icon: .profileUsername,
-                withText: OWSLocalizedString(
-                    "NEW_CONVERSATION_FIND_BY_USERNAME",
-                    comment: "A label for the cell that lets you add a new member by their username",
-                ),
+                withText: "Scanner un code mesh",
                 actionBlock: { [weak self] in
-                    guard let self else { return }
-                    let viewController = FindByUsernameViewController()
-                    viewController.findByUsernameDelegate = self
-                    self.navigationController?.pushViewController(viewController, animated: true)
+                    self?.openQRCodeScanner()
                 },
             ))
 
-            // Find by phone number
             staticSection.add(OWSTableItem.disclosureItem(
                 icon: .phoneNumber,
                 withText: OWSLocalizedString(
                     "NEW_CONVERSATION_FIND_BY_PHONE_NUMBER",
                     comment: "A label the cell that lets you add a new member to a group.",
                 ),
+                accessoryText: "Hors ligne",
+                textColor: .Signal.tertiaryLabel,
                 actionBlock: { [weak self] in
                     guard let self else { return }
-                    let viewController = FindByPhoneNumberViewController(
-                        delegate: self,
-                        buttonText: self.findByPhoneNumberButtonTitle,
-                        requiresRegisteredNumber: self.selectionMode != .blocklist,
+                    OWSActionSheets.showActionSheet(
+                        title: "Indisponible hors ligne",
+                        message: "Ce réseau fonctionne uniquement par Bluetooth, sans serveur ni numéro de téléphone.",
+                        fromViewController: self,
                     )
-                    self.navigationController?.pushViewController(viewController, animated: true)
                 },
             ))
         }
@@ -412,7 +405,7 @@ public class RecipientPickerViewController: OWSViewController, OWSNavigationChil
         }
 
         // Invite Contacts
-        if shouldShowInvites, !isSearching, SSKEnvironment.shared.contactManagerImplRef.sharingAuthorization != .denied {
+        if false, shouldShowInvites, !isSearching, SSKEnvironment.shared.contactManagerImplRef.sharingAuthorization != .denied {
             let bottomSection = OWSTableSection(title: OWSLocalizedString(
                 "INVITE_FRIENDS_CONTACT_TABLE_HEADER",
                 comment: "Header label above a section for more options for adding contacts",
@@ -646,7 +639,7 @@ extension RecipientPickerViewController {
             )
         }
 
-        if shouldShowInvites {
+        if false, shouldShowInvites {
             addButton(
                 title: OWSLocalizedString(
                     "INVITE_FRIENDS_CONTACT_TABLE_BUTTON",
@@ -961,11 +954,11 @@ extension RecipientPickerViewController {
             sections.append(groupSection)
         }
 
-        if let findByNumberSection = findByNumberSection(for: searchResults, skipping: matchedAccountPhoneNumbers) {
+        if false, let findByNumberSection = findByNumberSection(for: searchResults, skipping: matchedAccountPhoneNumbers) {
             sections.append(findByNumberSection)
         }
 
-        if let usernameSection = findByUsernameSection(for: searchResults) {
+        if false, let usernameSection = findByUsernameSection(for: searchResults) {
             sections.append(usernameSection)
         }
 
