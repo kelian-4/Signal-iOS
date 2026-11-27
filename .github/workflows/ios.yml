@@ -1,7 +1,7 @@
 name: ios
 on:
   push:
-    branches: [dev]
+    branches: [dev, 'ci-check/**']
   pull_request:
   workflow_dispatch:
 permissions:
@@ -29,13 +29,13 @@ jobs:
         run: |
           set -o pipefail
           xcodebuild build -workspace Signal.xcworkspace -scheme Signal \
-            -configuration Release -sdk iphoneos -derivedDataPath build \
+            -configuration Debug -destination 'generic/platform=iOS' -derivedDataPath build \
             -skipMacroValidation -skipPackagePluginValidation SWIFT_ENABLE_EXPLICIT_MODULES=NO \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" 2>&1 | tee "$RUNNER_TEMP/build.log" | tail -n 60
       - name: Package unsigned .ipa
         id: package
         run: |
-          APP=$(find build/Build/Products/Release-iphoneos -maxdepth 1 -name '*.app' | head -1)
+          APP=$(find build/Build/Products/Debug-iphoneos -maxdepth 1 -name '*.app' | head -1)
           test -n "$APP"
           rm -rf Payload Messagerie.ipa
           mkdir Payload
@@ -79,6 +79,8 @@ jobs:
                 echo "## fin du log $f (erreurs et dernières lignes)"
                 echo '```'
                 grep -E "error:|error •|failed|Fatal" "$RUNNER_TEMP/$f.log" | head -n 40
+                echo '--- LibSignal'
+                grep -E "LibSignal" "$RUNNER_TEMP/$f.log" | cut -c1-400 | head -n 30
                 echo '---'
                 tail -n 25 "$RUNNER_TEMP/$f.log"
                 echo '```'

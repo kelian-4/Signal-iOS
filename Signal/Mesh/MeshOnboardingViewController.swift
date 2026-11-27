@@ -112,7 +112,7 @@ final class MeshOnboardingViewController: UIViewController {
     }
 
     private func finish(words: [String]?, entropy: Data) {
-        let register = {
+        let register: () -> Void = {
             Task { @MainActor in
                 do {
                     try await MeshLocalRegistration.register(entropy: entropy)
