@@ -1,7 +1,7 @@
 name: ios
 on:
   push:
-    branches: [dev]
+    branches: [dev, 'ci-check/**']
   pull_request:
   workflow_dispatch:
 permissions:
@@ -9,6 +9,7 @@ permissions:
 jobs:
   build:
     runs-on: macos-15
+    timeout-minutes: 170
     steps:
       - uses: actions/checkout@v4
       - name: Package tests (frames, outbox, relay, QR, phrase, backup, service)
@@ -17,22 +18,22 @@ jobs:
         run: |
           set -o pipefail
           swift test 2>&1 | tee "$RUNNER_TEMP/tests.log" | tail -n 80
-      - name: Install XcodeGen
-        run: brew install xcodegen
-      - name: Generate the Xcode project
-        working-directory: MeshApp
-        run: xcodegen generate
-      - name: Build for device without signing
+      - name: Select newest Xcode
+        run: |
+          X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$X" ]; then sudo xcode-select -s "$X"; fi
+          xcodebuild -version
+      - name: Build Signal for device without signing
         id: build
-        working-directory: MeshApp
+        timeout-minutes: 120
         run: |
           set -o pipefail
-          xcodebuild build -project Messagerie.xcodeproj -scheme Messagerie \
-            -configuration Release -sdk iphoneos -derivedDataPath build \
+          xcodebuild build -workspace Signal.xcworkspace -scheme Signal \
+            -configuration Release -destination 'generic/platform=iOS' -derivedDataPath build \
+            -skipMacroValidation -skipPackagePluginValidation SWIFT_ENABLE_EXPLICIT_MODULES=NO \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" 2>&1 | tee "$RUNNER_TEMP/build.log" | tail -n 60
       - name: Package unsigned .ipa
         id: package
-        working-directory: MeshApp
         run: |
           APP=$(find build/Build/Products/Release-iphoneos -maxdepth 1 -name '*.app' | head -1)
           test -n "$APP"
@@ -44,13 +45,13 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: messagerie-unsigned-ipa
-          path: MeshApp/Messagerie.ipa
+          path: Messagerie.ipa
       - name: Publish pre-release for SideStore
         if: github.event_name != 'pull_request'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "build-${{ github.run_number }}" MeshApp/Messagerie.ipa \
+          gh release create "build-${{ github.run_number }}" Messagerie.ipa \
             --prerelease --target "${{ github.sha }}" \
             --title "iOS build ${{ github.run_number }}" \
             --notes "Unsigned .ipa for SideStore (commit ${{ github.sha }})."
@@ -78,6 +79,8 @@ jobs:
                 echo "## fin du log $f (erreurs et dernières lignes)"
                 echo '```'
                 grep -E "error:|error •|failed|Fatal" "$RUNNER_TEMP/$f.log" | head -n 40
+                echo '--- LibSignal'
+                grep -E "LibSignal" "$RUNNER_TEMP/$f.log" | cut -c1-400 | head -n 30
                 echo '---'
                 tail -n 25 "$RUNNER_TEMP/$f.log"
                 echo '```'
