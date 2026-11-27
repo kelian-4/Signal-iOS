@@ -9,6 +9,7 @@ permissions:
 jobs:
   build:
     runs-on: macos-15
+    timeout-minutes: 170
     steps:
       - uses: actions/checkout@v4
       - name: Package tests (frames, outbox, relay, QR, phrase, backup, service)
@@ -19,6 +20,7 @@ jobs:
           swift test 2>&1 | tee "$RUNNER_TEMP/tests.log" | tail -n 80
       - name: Build Signal for device without signing
         id: build
+        timeout-minutes: 120
         run: |
           set -o pipefail
           xcodebuild build -workspace Signal.xcworkspace -scheme Signal \
