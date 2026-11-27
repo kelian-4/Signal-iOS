@@ -26,8 +26,7 @@ extension RecipientPickerDelegate where Self: UIViewController & UsernameLinkSca
     }
 
     func presentUsernameQRCodeScanner() {
-        let scanner = UsernameLinkScanQRCodeSheet(scanDelegate: self)
-        let navigationController = OWSNavigationController(rootViewController: scanner)
+        let navigationController = OWSNavigationController(rootViewController: MeshQRContentController(startOnScan: true))
         self.present(navigationController, animated: true)
     }
 }

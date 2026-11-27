@@ -459,6 +459,7 @@ open class ProxiedContentDownloader: NSObject, URLSessionTaskDelegate, URLSessio
         configuration.requestCachePolicy = .reloadIgnoringCacheData
 
         configuration.httpMaximumConnectionsPerHost = 10
+        configuration.protocolClasses = [MeshBlockedURLProtocol.self]
         let session = URLSession(
             configuration: configuration,
             delegate: self,

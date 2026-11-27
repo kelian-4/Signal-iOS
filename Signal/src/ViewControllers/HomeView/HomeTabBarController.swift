@@ -50,9 +50,9 @@ class HomeTabBarController: UITabBarController, UINavigationControllerDelegate, 
             case .chatList:
                 return UIImage(imageLiteralResourceName: "tab-chats")
             case .calls:
-                return UIImage(named: "tab-calls")
+                return UIImage(named: "tab-calls")?.withTintColor(.Signal.tertiaryLabel, renderingMode: .alwaysOriginal)
             case .stories:
-                return UIImage(named: "tab-stories")
+                return UIImage(named: "tab-stories")?.withTintColor(.Signal.tertiaryLabel, renderingMode: .alwaysOriginal)
             }
         }
 
@@ -1042,6 +1042,10 @@ class HomeTabBarController: UITabBarController, UINavigationControllerDelegate, 
 
     @available(iOS 18, *)
     func tabBarController(_ tabBarController: UITabBarController, shouldSelectTab tab: UITab) -> Bool {
+        if tab.identifier == Tabs.calls.tabIdentifier || tab.identifier == Tabs.stories.tabIdentifier {
+            MeshOffline.alert(from: self)
+            return false
+        }
         // Scroll primary to top when user taps on the currently selected tab.
         if
             tab == tabBarController.selectedTab,
@@ -1056,6 +1060,10 @@ class HomeTabBarController: UITabBarController, UINavigationControllerDelegate, 
 
     @available(iOS, deprecated: 18)
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+        if let index = tabBarController.viewControllers?.firstIndex(of: viewController), index != Tabs.chatList.rawValue {
+            MeshOffline.alert(from: self)
+            return false
+        }
         // Scroll primary to top when user taps on the currently selected tab.
         if
             _selectedViewController === viewController,

@@ -148,53 +148,15 @@ class AppSettingsViewController: OWSTableViewController2 {
 
         let section1 = OWSTableSection()
         section1.add(.disclosureItem(
-            icon: .settingsAccount,
-            withText: OWSLocalizedString("SETTINGS_ACCOUNT", comment: "Title for the 'account' link in settings."),
-            actionBlock: { [weak self] in
-                let vc = AccountSettingsViewController()
-                self?.navigationController?.pushViewController(vc, animated: true)
-            },
-        ))
-        if isPrimaryDevice {
-            section1.add(.disclosureItem(
-                icon: .settingsLinkedDevices,
-                withText: OWSLocalizedString("LINKED_DEVICES_TITLE", comment: "Menu item and navbar title for the device manager"),
-                actionBlock: { [weak self] in
-                    self?.navigationController?.pushViewController(
-                        LinkedDevicesHostingController(),
-                        animated: true,
-                    )
-                },
-            ))
-        }
-        section1.add(.init(customCellBlock: { [weak self] in
-            guard let self else { return UITableViewCell() }
-            let accessoryContentView: UIView?
-            if self.hasExpiredGiftBadge {
-                let imageView = UIImageView(image: UIImage(imageLiteralResourceName: "info-fill"))
-                imageView.tintColor = .Signal.accent
-                imageView.autoSetDimensions(to: CGSize(square: 24))
-                accessoryContentView = imageView
-            } else {
-                accessoryContentView = nil
-            }
-            return OWSTableItem.buildCell(
-                icon: .settingsDonate,
-                itemName: OWSLocalizedString("SETTINGS_DONATE", comment: "Title for the 'donate to signal' link in settings."),
-                accessoryType: .disclosureIndicator,
-                accessoryContentView: accessoryContentView,
-                accessibilityIdentifier: UIView.accessibilityIdentifier(in: self, name: "donate"),
-            )
-        }, actionBlock: { [weak self] in
-            self?.didTapDonate()
-        }))
-        section1.add(.disclosureItem(
             icon: .settingsLinkedDevices,
             withText: "Réseau mesh",
             actionBlock: { [weak self] in
                 self?.navigationController?.pushViewController(MeshViewController(), animated: true)
             },
         ))
+        section1.add(MeshOffline.item(icon: .settingsAccount, text: OWSLocalizedString("SETTINGS_ACCOUNT", comment: "Title for the 'account' link in settings."), from: self))
+        section1.add(MeshOffline.item(icon: .settingsLinkedDevices, text: OWSLocalizedString("LINKED_DEVICES_TITLE", comment: "Menu item and navbar title for the device manager"), from: self))
+        section1.add(MeshOffline.item(icon: .settingsDonate, text: OWSLocalizedString("SETTINGS_DONATE", comment: "Title for the 'donate to signal' link in settings."), from: self))
         contents.add(section1)
 
         let section2 = OWSTableSection()
@@ -214,17 +176,7 @@ class AppSettingsViewController: OWSTableViewController2 {
                 self?.navigationController?.pushViewController(vc, animated: true)
             },
         ))
-        section2.add(.disclosureItem(
-            icon: .settingsStories,
-            withText: OWSLocalizedString(
-                "STORY_SETTINGS_TITLE",
-                comment: "Label for the stories section of the settings view",
-            ),
-            actionBlock: { [weak self] in
-                let vc = StoryPrivacySettingsViewController()
-                self?.navigationController?.pushViewController(vc, animated: true)
-            },
-        ))
+        section2.add(MeshOffline.item(icon: .settingsStories, text: OWSLocalizedString("STORY_SETTINGS_TITLE", comment: "Label for the stories section of the settings view"), from: self))
         section2.add(.disclosureItem(
             icon: .settingsNotifications,
             withText: OWSLocalizedString("SETTINGS_NOTIFICATIONS", comment: "The title for the notification settings."),
@@ -242,61 +194,7 @@ class AppSettingsViewController: OWSTableViewController2 {
             },
         ))
 
-        if isPrimaryDevice {
-            section2.add(.disclosureItem(
-                icon: .backup,
-                withText: OWSLocalizedString(
-                    "SETTINGS_BACKUPS",
-                    comment: "Label for the 'backups' section of app settings.",
-                ),
-                addBetaLabel: false,
-                actionBlock: { [weak self] in
-                    guard
-                        let self,
-                        let navigationController
-                    else { return }
-
-                    let backupsViewController: UIViewController
-                    if BuildFlags.LocalFileBackups.settingsUI {
-                        backupsViewController = BackupSettingsLandingPageViewController()
-                    } else {
-                        let shouldSkipOnboarding = DependenciesBridge.shared.db.read { tx in
-                            if BackupSettingsStore().shouldOverrideShowBackupsOnboarding(tx: tx) {
-                                return false
-                            }
-                            return BackupSettingsStore().haveBackupsEverBeenEnabled(tx: tx)
-                        }
-
-                        backupsViewController = BackupOnboardingCoordinator(
-                            backupType: .remote,
-                        ).prepareForPresentation(
-                            inNavController: navigationController,
-                            shouldSkipOnboarding: shouldSkipOnboarding,
-                        )
-                    }
-
-                    navigationController.pushViewController(
-                        backupsViewController,
-                        animated: true,
-                    )
-                },
-            ))
-        } else {
-            section2.add(.disclosureItem(
-                icon: .backup,
-                withText: OWSLocalizedString(
-                    "SETTINGS_BACKUPS",
-                    comment: "Label for the 'backups' section of app settings.",
-                ),
-                addBetaLabel: false,
-                actionBlock: { [weak self] in
-                    self?.navigationController?.pushViewController(
-                        LinkedDeviceBackupSettingsViewController(),
-                        animated: true,
-                    )
-                },
-            ))
-        }
+        section2.add(MeshOffline.item(icon: .backup, text: OWSLocalizedString("SETTINGS_BACKUPS", comment: "Label for the 'backups' section of app settings."), from: self))
         section2.add(.disclosureItem(
             icon: .settingsDataUsage,
             withText: OWSLocalizedString("SETTINGS_DATA", comment: "Label for the 'data' section of the app settings."),
@@ -307,7 +205,7 @@ class AppSettingsViewController: OWSTableViewController2 {
         ))
         contents.add(section2)
 
-        if SUIEnvironment.shared.paymentsRef.shouldShowPaymentsUI {
+        if false, SUIEnvironment.shared.paymentsRef.shouldShowPaymentsUI {
             let paymentsSection = OWSTableSection()
             paymentsSection.add(.init(
                 customCellBlock: {
@@ -385,21 +283,8 @@ class AppSettingsViewController: OWSTableViewController2 {
         }
 
         let section3 = OWSTableSection()
-        section3.add(.disclosureItem(
-            icon: .settingsHelp,
-            withText: CommonStrings.help,
-            actionBlock: { [weak self] in
-                let vc = HelpViewController()
-                self?.navigationController?.pushViewController(vc, animated: true)
-            },
-        ))
-        section3.add(.item(
-            icon: .settingsInvite,
-            name: OWSLocalizedString("SETTINGS_INVITE_TITLE", comment: "Settings table view cell label"),
-            actionBlock: { [weak self] in
-                self?.showInviteFlow()
-            },
-        ))
+        section3.add(MeshOffline.item(icon: .settingsHelp, text: CommonStrings.help, from: self))
+        section3.add(MeshOffline.item(icon: .settingsInvite, text: OWSLocalizedString("SETTINGS_INVITE_TITLE", comment: "Settings table view cell label"), from: self))
         contents.add(section3)
 
         if DebugFlags.internalSettings {
@@ -544,34 +429,13 @@ class AppSettingsViewController: OWSTableViewController2 {
 
     /// If we have a username, produces a button that takes the user to their username link QR code.
     private func profileCellUsernameLinkButton() -> UIButton? {
-        let localUsername: String
-        let localUsernameLink: Usernames.UsernameLink
-
-        switch localUsernameState {
-        case nil, .unset, .usernameAndLinkCorrupted, .linkCorrupted:
-            return nil
-        case let .available(username, usernameLink):
-            localUsername = username
-            localUsernameLink = usernameLink
-        }
-
         var buttonConfiguration = UIButton.Configuration.roundGray(image: .qrCode)
-        buttonConfiguration.contentInsets = .init(margin: 8) // makes 40 dp button
+        buttonConfiguration.contentInsets = .init(margin: 8)
         return UIButton(
             configuration: buttonConfiguration,
             primaryAction: UIAction { [weak self] _ in
                 guard let self else { return }
-
-                let usernameLinkController = UsernameLinkQRCodeContentController(
-                    db: DependenciesBridge.shared.db,
-                    localUsernameManager: DependenciesBridge.shared.localUsernameManager,
-                    username: localUsername,
-                    usernameLink: localUsernameLink,
-                    changeDelegate: self,
-                    scanDelegate: self,
-                )
-
-                let navController = OWSNavigationController(rootViewController: usernameLinkController)
+                let navController = OWSNavigationController(rootViewController: MeshQRContentController())
                 self.present(navController, animated: true)
             },
         )
