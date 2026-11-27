@@ -49,11 +49,6 @@ public func owsFailDebug(
     logger.flush()
     if IsDebuggerAttached() {
         TrapDebugger()
-    } else if Preferences.isFailDebugEnabled {
-        Preferences.setIsFailDebugEnabled(false)
-        fatalError(logMessage)
-    } else {
-        assertionFailure(logMessage)
     }
 }
 

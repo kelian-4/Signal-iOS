@@ -32,6 +32,34 @@ jobs:
             -configuration Debug -destination 'generic/platform=iOS' -derivedDataPath build \
             -skipMacroValidation -skipPackagePluginValidation SWIFT_ENABLE_EXPLICIT_MODULES=NO \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" 2>&1 | tee "$RUNNER_TEMP/build.log" | tail -n 60
+      - name: Launch test on the iOS simulator
+        id: launch
+        continue-on-error: true
+        timeout-minutes: 45
+        run: |
+          set +e
+          L="$RUNNER_TEMP/launch.log"
+          xcodebuild build -workspace Signal.xcworkspace -scheme Signal \
+            -configuration Debug -destination 'generic/platform=iOS Simulator' -derivedDataPath build-sim \
+            -skipMacroValidation -skipPackagePluginValidation SWIFT_ENABLE_EXPLICIT_MODULES=NO \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" > "$RUNNER_TEMP/simbuild.log" 2>&1
+          if [ $? -ne 0 ]; then echo "simulator build failed" > "$L"; grep "error:" "$RUNNER_TEMP/simbuild.log" | head -20 >> "$L"; exit 1; fi
+          APP=$(find build-sim/Build/Products/Debug-iphonesimulator -maxdepth 1 -name '*.app' | head -1)
+          UDID=$(xcrun simctl list devices available -j | jq -r '[.devices[][] | select(.name | startswith("iPhone"))][0].udid')
+          xcrun simctl boot "$UDID"
+          xcrun simctl bootstatus "$UDID" -b > /dev/null 2>&1
+          xcrun simctl install "$UDID" "$APP"
+          BID=$(/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' "$APP/Info.plist")
+          START=$(date +%s)
+          xcrun simctl launch "$UDID" "$BID" > "$L" 2>&1
+          sleep 30
+          ALIVE=$(xcrun simctl spawn "$UDID" launchctl list | grep -c "UIKitApplication:$BID")
+          echo "alive: $ALIVE" >> "$L"
+          xcrun simctl spawn "$UDID" log show --last 2m --style compact --predicate 'process == "Signal"' 2>&1 | grep -iE "fatal|assert|crash|terminat|Mesh|error" | tail -n 60 >> "$L"
+          for r in "$HOME"/Library/Logs/DiagnosticReports/*.ips; do
+            [ -f "$r" ] && { echo "--- $r"; head -c 6000 "$r"; } >> "$L"
+          done
+          test "$ALIVE" -ge 1 && ! ls "$HOME"/Library/Logs/DiagnosticReports/Signal*.ips > /dev/null 2>&1
       - name: Package unsigned .ipa
         id: package
         run: |
@@ -61,6 +89,7 @@ jobs:
           TESTS: ${{ steps.tests.outcome }}
           BUILD: ${{ steps.build.outcome }}
           PACKAGE: ${{ steps.package.outcome }}
+          LAUNCH: ${{ steps.launch.outcome }}
           JOB: ${{ job.status }}
         run: |
           {
@@ -73,6 +102,8 @@ jobs:
             echo "- swift test: ${TESTS}"
             echo "- xcodebuild: ${BUILD}"
             echo "- ipa: ${PACKAGE}"
+            echo "- lancement simulateur: ${LAUNCH}"
+            if [ -f "$RUNNER_TEMP/launch.log" ]; then echo; echo "## lancement"; echo '```'; head -c 9000 "$RUNNER_TEMP/launch.log"; echo '```'; fi
             for f in tests build; do
               if [ -f "$RUNNER_TEMP/$f.log" ]; then
                 echo
