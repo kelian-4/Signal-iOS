@@ -30,7 +30,7 @@ jobs:
           set -o pipefail
           xcodebuild build -workspace Signal.xcworkspace -scheme Signal \
             -configuration Release -sdk iphoneos -derivedDataPath build \
-            -skipMacroValidation -skipPackagePluginValidation \
+            -skipMacroValidation -skipPackagePluginValidation SWIFT_ENABLE_EXPLICIT_MODULES=NO \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" 2>&1 | tee "$RUNNER_TEMP/build.log" | tail -n 60
       - name: Package unsigned .ipa
         id: package
